@@ -140,12 +140,10 @@ const startWithMusic = () => {
     });
     isPlaying.value = true;
   }
-  nextScreen();
 };
 
 const startWithoutMusic = () => {
   showMusicPrompt.value = false;
-  nextScreen();
 };
 
 const images = [Image1, Image2, Image3, Image4];
