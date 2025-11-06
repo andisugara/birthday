@@ -4,6 +4,7 @@ import Image1 from "./assets/images/photo1.jpeg";
 import Image2 from "./assets/images/photo2.jpeg";
 import Image3 from "./assets/images/photo3.jpeg";
 import Image4 from "./assets/images/photo4.jpeg";
+import BackgroundMusic from "./assets/music/music.mp3";
 
 // Screen navigation
 const currentScreen = ref(0);
@@ -82,6 +83,11 @@ const showWishes = ref(false);
 // Screen 10: Final
 const showFinal = ref(false);
 
+// Music control
+const isPlaying = ref(false);
+const audioRef = ref<HTMLAudioElement | null>(null);
+const showMusicPrompt = ref(true);
+
 const balloons = ref<
   Array<{ id: number; color: string; delay: number; left: string }>
 >([]);
@@ -110,6 +116,37 @@ onMounted(() => {
     showOpening.value = true;
   }, 300);
 });
+
+const toggleMusic = () => {
+  if (!audioRef.value) return;
+
+  if (isPlaying.value) {
+    audioRef.value.pause();
+    isPlaying.value = false;
+  } else {
+    audioRef.value.play().catch((err) => {
+      console.log("Audio play failed:", err);
+    });
+    isPlaying.value = true;
+    showMusicPrompt.value = false;
+  }
+};
+
+const startWithMusic = () => {
+  showMusicPrompt.value = false;
+  if (audioRef.value) {
+    audioRef.value.play().catch((err) => {
+      console.log("Audio play failed:", err);
+    });
+    isPlaying.value = true;
+  }
+  nextScreen();
+};
+
+const startWithoutMusic = () => {
+  showMusicPrompt.value = false;
+  nextScreen();
+};
 
 const images = [Image1, Image2, Image3, Image4];
 
@@ -213,6 +250,51 @@ const prevReason = () => {
 
 <template>
   <div class="min-h-screen relative overflow-hidden">
+    <!-- Background Music -->
+    <audio ref="audioRef" loop :src="BackgroundMusic"></audio>
+
+    <!-- Music Control Button -->
+    <button
+      v-if="!showMusicPrompt"
+      @click="toggleMusic"
+      class="fixed top-6 right-6 z-50 bg-white/90 backdrop-blur-sm text-purple-600 p-4 rounded-full shadow-2xl hover:scale-110 transition-transform duration-300 cursor-pointer"
+    >
+      <span v-if="isPlaying" class="text-2xl">🎵</span>
+      <span v-else class="text-2xl">🔇</span>
+    </button>
+
+    <!-- Music Prompt Overlay -->
+    <div
+      v-if="showMusicPrompt && showOpening"
+      class="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 flex items-center justify-center"
+    >
+      <div
+        class="bg-white rounded-3xl p-8 md:p-12 max-w-md mx-4 text-center animate-fadeIn shadow-2xl"
+      >
+        <div class="text-6xl mb-6">🎵</div>
+        <h3 class="text-2xl md:text-3xl font-bold text-purple-600 mb-4">
+          Musik Background?
+        </h3>
+        <p class="text-gray-600 mb-8">
+          Pengalaman lebih indah dengan musik romantis 💕
+        </p>
+        <div class="flex gap-4 justify-center">
+          <button
+            @click="startWithMusic"
+            class="bg-linear-to-r from-pink-500 to-purple-500 text-white px-8 py-3 rounded-full font-bold hover:scale-105 transition-transform duration-300 shadow-xl cursor-pointer"
+          >
+            Ya, Putar Musik 🎵
+          </button>
+          <button
+            @click="startWithoutMusic"
+            class="bg-gray-200 text-gray-700 px-8 py-3 rounded-full font-bold hover:scale-105 transition-transform duration-300 cursor-pointer"
+          >
+            Skip
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Animated Background Balloons -->
     <div
       class="absolute inset-0 pointer-events-none overflow-hidden"
@@ -239,7 +321,10 @@ const prevReason = () => {
       class="min-h-screen bg-linear-to-br from-indigo-900 via-purple-900 to-pink-900 flex items-center justify-center transition-opacity duration-1000"
       :class="{ 'opacity-0': isTransitioning }"
     >
-      <div v-if="showOpening" class="text-center animate-fadeIn px-4">
+      <div
+        v-if="showOpening && !showMusicPrompt"
+        class="text-center animate-fadeIn px-4"
+      >
         <div class="text-6xl mb-8 animate-float">🎁</div>
         <h1
           class="text-5xl md:text-7xl font-bold text-white mb-8 animate-pulse-custom"
