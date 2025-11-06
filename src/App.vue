@@ -4,7 +4,7 @@ import Image1 from "./assets/images/photo1.jpeg";
 import Image2 from "./assets/images/photo2.jpeg";
 import Image3 from "./assets/images/photo3.jpeg";
 import Image4 from "./assets/images/photo4.jpeg";
-import BackgroundMusic from "./assets/music/music.mp3";
+import BackgroundMusic from "./assets/music/music1.mp3";
 
 // Screen navigation
 const currentScreen = ref(0);
